@@ -22,7 +22,7 @@ module lsu (
   output logic [31:0] o_io_hex5,
   output logic [31:0] o_io_hex6,
   output logic [31:0] o_io_hex7,
-  output logic [31:0] o_io_lcd,
+  output logic [31:0] o_io_lcd
 );
 //Local param
 // Base addresses
@@ -101,7 +101,7 @@ always_comb begin
         st_strb = 4'hF;
     end
 
-    defaule: begin
+    default: begin
       st_data = '0;
       st_strb = '0;
     end
