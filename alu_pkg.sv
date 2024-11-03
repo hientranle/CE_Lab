@@ -9,6 +9,7 @@ package alu_pkg;
  parameter [3:0] ALU_SLL  = 4'h7;
  parameter [3:0] ALU_SRL  = 4'h8;
  parameter [3:0] ALU_SRA  = 4'h9;
+ parameter [3:0] ALU_LUI  = 4'hA;
  //Sub operation
 function logic [32:0] Sub;
   input logic [31:0] Rs1;
