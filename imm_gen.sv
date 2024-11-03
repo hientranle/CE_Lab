@@ -1,8 +1,8 @@
 import control_types::*;
 module imm_gen (
-    input logic [24:0] IN,					// INST[31:7]
-    input imm_ctrl IMM_SEL,
-    output logic [31:0] OUT
+    input logic [24:0] in,					// inst[31:7]
+    input imm_ctrl imm_sel,
+    output logic [31:0] out
 );
 
 //    `define SE20_UI 3'b000
@@ -13,34 +13,18 @@ module imm_gen (
 //    `define SE20_JP 3'b111
     
     always_comb begin
-        if (IMM_SEL == SE20_UI) begin 				// U TYPE
-            OUT[31:12] = IN[24:5];
-            OUT[11:0] = {12{1'b0}};
-        end else if (IMM_SEL == SE12_LI) begin			//  I TYPE - LOAD INSTRUCTION
-            OUT[11:0] = IN[24:13];
-            OUT[31:12] = {20{IN[24]}};
-        end else if (IMM_SEL == SE05) begin			// SHIFT IMMEDIATE
-            OUT[4:0] = IN[17:13];
-            OUT[31:5] = 27'b0;
-        end else if (IMM_SEL == SE12_BR) begin			// B TYPE
-            OUT[0] = {1'b0};
-            OUT[4:1] = IN[4:1];
-            OUT[10:5] = IN[23:18];
-            OUT[11] = IN[0];
-            OUT[12] = IN[24];
-            OUT[31:13] = {19{IN[24]}};
-        end else if (IMM_SEL == SE12_ST) begin			// S TYPE
-            OUT[4:0] = IN[4:0];
-            OUT[11:5] = IN[24:18];
-            OUT[31:12] = {20{IN[24]}};
-        end else if (IMM_SEL == SE20_JP) begin			// JAL
-            OUT[0] = {1'b0};
-            OUT[10:1] = IN[23:14];
-            OUT[11] = IN[13];
-            OUT[20] = IN[24];
-            OUT[31:21] = {11{IN[24]}};
+        if (imm_sel == SE20_UI) begin 				// U TYPE
+            out = {in[24:5], 12'b0};
+        end else if (imm_sel == SE12_LI) begin			//  I TYPE - LOAD INSTRUCTION
+            out = {{20{in[24]}}, in[24:13]};
+        end else if (imm_sel == SE12_BR) begin			// B TYPE
+           out = {{19{in[24]}}, in[24], in[0], in[23:18], in[4:1], 1'b0};
+        end else if (imm_sel == SE12_ST) begin			// S TYPE
+            out = {{20{in[24]}}, in[24:18], in[4:0]};
+        end else if (imm_sel == SE20_JP) begin			// JAL
+				out = {{11{in[24]}}, in[24], in[12:5], in[13], in[23:14], 1'b0};
         end else begin
-            OUT = 32'h0;
+            out = 32'h0;
         end   
     end
 endmodule

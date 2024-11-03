@@ -17,9 +17,9 @@ function logic [32:0] Sub;
         logic [31:0] InvRs2;
         logic [31:0] InvRs2P1;
   begin
-    InvRs1   = ~Rs2;
-    InvRs1P1 = InvRs2 + 1'b1;
-    Sub      = Rs0 + InvRs2P1[31:0];
+    InvRs2   = ~Rs2;
+    InvRs2P1 = InvRs2 + 1'b1;
+    Sub      = Rs1 + InvRs2P1[31:0];
   end
 endfunction
 
@@ -27,32 +27,51 @@ function logic [31:0] SLL (
   input logic [31:0] i_op,
   input logic [4:0]  shift_param
 );
-  if (shift_param[0]) SLL = {i_op[31:0],1'h0};
-  if (shift_param[1]) SLL = {i_op[29:0],2'h0};
-  if (shift_param[2]) SLL = {i_op[27:0],4'h0};
-  if (shift_param[3]) SLL = {i_op[23:0],8'h0};
-  if (shift_param[4]) SLL = {i_op[15:0],16'h0};
+  logic [31:0] result;
+  result = i_op;
+//  if (shift_param[0]) SLL = {i_op[30:0],1'h0};
+//  if (shift_param[1]) SLL = {i_op[29:0],2'h0};
+//  if (shift_param[2]) SLL = {i_op[27:0],4'h0};
+//  if (shift_param[3]) SLL = {i_op[23:0],8'h0};
+//  if (shift_param[4]) SLL = {i_op[15:0],16'h0};
+  if (shift_param[4]) result = {result[15:0], 16'h0}; // Shift by 16 if shift_param[4] is set
+  if (shift_param[3]) result = {result[23:0], 8'h0};  // Shift by 8 if shift_param[3] is set
+  if (shift_param[2]) result = {result[27:0], 4'h0};  // Shift by 4 if shift_param[2] is set
+  if (shift_param[1]) result = {result[29:0], 2'h0};  // Shift by 2 if shift_param[1] is set
+  if (shift_param[0]) result = {result[30:0], 1'h0};  // Shift by 1 if shift_param[0] is set
+
+    SLL = result;  // Assign the final result to SLL output
 endfunction
 
 function logic [31:0] SRL (
   input logic [31:0] i_op,
   input logic [4:0]  shift_param
 );
-  if (shift_param[0]) SRL = {1'h0,i_op[31:0]};
-  if (shift_param[1]) SRL = {2'h0,i_op[29:0]};
-  if (shift_param[2]) SRL = {4'h0,i_op[27:0]};
-  if (shift_param[3]) SRL = {8'h0,i_op[23:0]};
-  if (shift_param[4]) SRL = {16'h0,i_op[15:0]};
+  logic [31:0] result;
+  result = i_op;
+  
+  if (shift_param[0]) result = {1'h0,i_op[30:0]};
+  if (shift_param[1]) result = {2'h0,i_op[29:0]};
+  if (shift_param[2]) result = {4'h0,i_op[27:0]};
+  if (shift_param[3]) result = {8'h0,i_op[23:0]};
+  if (shift_param[4]) result = {16'h0,i_op[15:0]};
+  
+  SRL = result;
 endfunction
 
 function logic [31:0] SRA (
   input logic [31:0] i_op,
   input logic [4:0]  shift_param
 );
-  if (shift_param[0]) SRL = {{1{i_op[31]}},i_op[31:0]};
-  if (shift_param[1]) SRL = {{2{i_op[31]}},i_op[29:0]};
-  if (shift_param[2]) SRL = {{4{i_op[31]}},i_op[27:0]};
-  if (shift_param[3]) SRL = {{8{i_op[31]}},i_op[23:0]};
-  if (shift_param[4]) SRL = {{16{i_op[31]}},i_op[15:0]};
+  logic [31:0] result;
+  result = i_op;
+  
+  if (shift_param[0]) result = {{1{i_op[31]}},i_op[30:0]};
+  if (shift_param[1]) result = {{2{i_op[31]}},i_op[29:0]};
+  if (shift_param[2]) result = {{4{i_op[31]}},i_op[27:0]};
+  if (shift_param[3]) result = {{8{i_op[31]}},i_op[23:0]};
+  if (shift_param[4]) result = {{16{i_op[31]}},i_op[15:0]};
+  
+  SRA = result;
 endfunction
 endpackage

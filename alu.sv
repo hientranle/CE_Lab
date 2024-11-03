@@ -1,10 +1,10 @@
 module alu 
-import alu_pkg::*
+import alu_pkg::*;
 (
   input logic [31:0] i_op_a,
   input logic [31:0] i_op_b,
   input logic [3:0]  i_alu_op,
-  input logic        i_BrLT,
+  input logic        i_br_lt,
   
   output logic [31:0] o_alu_data
 );
@@ -22,8 +22,8 @@ always_comb begin: AluLogic
   case(i_alu_op)
     ALU_ADD  : o_alu_data = resultAdd[31:0]; 
     ALU_SUB  : o_alu_data = resultSub[31:0];
-    ALU_SLT  : o_alu_data = {31'h0,i_BrLT}; 
-    ALU_SLTU : o_alu_data = {31'h0,i_BrLT}; 
+    ALU_SLT  : o_alu_data = {31'h0,i_br_lt}; 
+    ALU_SLTU : o_alu_data = {31'h0,i_br_lt}; 
     //ALU_SLT  : o_alu_data = resultSlt;
     //ALU_SLTU : o_alu_data = resultSltu;
     ALU_XOR  : o_alu_data = resultXor;
@@ -50,8 +50,8 @@ always_comb begin
   resultOr  = i_op_a | i_op_b;
   resultAnd = i_op_a & i_op_b;
   resultSll = SLL(i_op_a,i_op_b[4:0]);
-  resultSll = SRA(i_op_a,i_op_b[4:0]);
-  resultSll = SRL(i_op_a,i_op_b[4:0]);
+  resultSra = SRA(i_op_a,i_op_b[4:0]);
+  resultSrl = SRL(i_op_a,i_op_b[4:0]);
 end
 //comparator unsigned_comp (
 //  .i_rs1_data(i_op_a), 

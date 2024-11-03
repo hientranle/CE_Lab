@@ -31,7 +31,6 @@ package control_types;
 	 typedef enum logic [2:0] {
 	     SE20_UI,
         SE12_LI,
-        SE05,
         SE12_BR,
         SE12_ST,
         SE20_JP,
@@ -269,7 +268,7 @@ module control_unit (
 								inst_vld = 1'b1;
 						  end
 						  3'b001: begin
-						      imm_sel = SE05;
+						      imm_sel = SE12_LI;
 								a_sel = REG;
 								b_sel = OTHER_OPERAND;
 								alu_sel = SLL;
@@ -281,10 +280,10 @@ module control_unit (
 								inst_vld = 1'b1;
 						  end
 						  3'b101: begin
-						      imm_sel = SE05;
+						      imm_sel = SE12_LI;
 								a_sel = REG;
 								b_sel = OTHER_OPERAND;
-								if (inst[30]) begin
+								if (inst[3]) begin
 								    alu_sel = SRA;
 								end else begin
 								    alu_sel = SRL;
@@ -376,7 +375,7 @@ module control_unit (
 								br_un = SIGN;
 					         inst_vld = 1'b1;
 						  end
-						  3'b100: begin						// BLTU
+						  3'b110: begin						// BLTU
 					         imm_sel = SE12_BR;
 					         a_sel = OTHER_OPERAND;
 					         b_sel = OTHER_OPERAND;
@@ -392,7 +391,7 @@ module control_unit (
 								br_un = UNSIGN;
 					         inst_vld = 1'b1;
 						  end
-						  3'b101: begin						// BGEU
+						  3'b111: begin						// BGEU
 					         imm_sel = SE12_BR;
 					         a_sel = OTHER_OPERAND;
 					         b_sel = OTHER_OPERAND;
@@ -471,7 +470,7 @@ module control_unit (
 					 inst_vld = 1'b1;
 				end
 				`LOAD: begin
-				    imm_sel = REG;
+				    imm_sel = SE12_LI;
 				    a_sel = REG;
 				    b_sel = OTHER_OPERAND;
 				    alu_sel = ADD;
@@ -481,6 +480,18 @@ module control_unit (
 				    pc_sel = PC_FOUR;
 				    br_un = UNSIGN;
 				    inst_vld = 1'b1;
+				end
+				default: begin
+				    imm_sel = OTHER_IMM_CTRL;
+				    a_sel = REG;
+				    b_sel = REG;
+				    alu_sel = ADD;
+				    mem_rw = READ;
+				    reg_wen = DISABLE;
+				    wb_sel = ALU;
+				    pc_sel = PC_FOUR;
+				    br_un = UNSIGN;
+				    inst_vld = 1'b0;
 				end
 		  endcase
 	 end
