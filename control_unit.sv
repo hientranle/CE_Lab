@@ -1,24 +1,25 @@
 package control_types;
     typedef enum logic {
-        REG = 0,
-		  OTHER_OPERAND = 1
+        REG = 1'b0,
+		  OTHER_OPERAND = 1'b1
 	 } operand;
 	 
 	 typedef enum logic {
-	     ALU_OUT = 1,
-		  PC_FOUR = 0
+	     ALU_OUT = 1'b1,
+		  PC_FOUR = 1'b0
 	 } pc_ctrl;
 	 
 	 typedef enum logic [3:0] {
-	     ADD,
-        SUB,
-        L_AND,
-        L_OR,
-        L_XOR,
-        SLL,
-        SRL,
-        SRA,
-        SLT
+	     ADD = 4'h0,
+        SUB = 4'h1,
+		  SLT = 4'h2,
+		  L_XOR = 4'h4,
+		  L_OR = 4'h5,
+        L_AND = 4'h6,
+        SLL = 4'h7,
+        SRL = 4'h8,
+        SRA = 4'h9,
+		  LUI = 4'hA
 	 } alu_ctrl;
 	 
 	 typedef enum logic [1:0]{
@@ -38,18 +39,18 @@ package control_types;
 	 } imm_ctrl;
 	 
 	typedef enum logic {
-		  READ = 0,
-		  WRITE = 1		  
+		  READ = 1'b0,
+		  WRITE = 1'b1		  
 	} mem_op;
 	
 	typedef enum logic {
-	     ENABLE = 1,
-		  DISABLE = 0
+	     ENABLE = 1'b1,
+		  DISABLE = 1'b0
 	} reg_en;
 	
 	typedef enum logic {
-	     SIGN = 0,
-		  UNSIGN = 1
+	     SIGN = 1'b0,
+		  UNSIGN = 1'b1
 	} sign_comp;
 endpackage
 
@@ -70,7 +71,7 @@ module control_unit (
 	 input  logic [3:0]   inst,        // 4-bit instruction  
     input  logic         br_eq,        // Branch Equal flag
     input  logic         br_lt,        // Branch Less Than flag
-	 input  logic         data_vld,     // Valid load data
+//	 input  logic         data_vld,     // Valid load data
     output pc_ctrl       pc_sel,       // Program Counter Select
     output imm_ctrl      imm_sel,      // Immediate Select
     output operand       a_sel,        // A input Select
@@ -79,7 +80,7 @@ module control_unit (
     output mem_op        mem_rw,       // Memory Read/Write
     output reg_en        reg_wen,      // Register Write Enable
     output wb_ctrl       wb_sel,        // Write Back Select
-	 output sign_comp     br_un,
+	 output sign_comp     br_un,         // Unsigned compare 
 	 output logic         inst_vld       // Instruction valid
 );
 
@@ -422,16 +423,64 @@ module control_unit (
 					 endcase
 				end
 				`JAL: begin
-				     imm_sel = SE20_JP;
-					  a_sel = OTHER_OPERAND;
-					  b_sel = OTHER_OPERAND;
-					  alu_sel = ADD;
-					  mem_rw = READ;
-					  reg_wen = ENABLE;
-					  wb_sel = PC;
-					  pc_sel = ALU_OUT;
-					  br_un = UNSIGN;
-					  inst_vld = 1'b1;
+				    imm_sel = SE20_JP;
+				    a_sel = OTHER_OPERAND;
+				    b_sel = OTHER_OPERAND;
+				    alu_sel = ADD;
+				    mem_rw = READ;
+					 reg_wen = ENABLE;
+					 wb_sel = PC;
+					 pc_sel = ALU_OUT;
+					 br_un = UNSIGN;
+					 inst_vld = 1'b1;
+				end
+				`JALR: begin
+				    imm_sel = SE12_LI;
+					 a_sel = REG;
+					 b_sel = OTHER_OPERAND;
+					 alu_sel = ADD;
+					 mem_rw = READ;
+					 reg_wen = ENABLE;
+					 wb_sel = PC;
+					 pc_sel = ALU_OUT;
+					 br_un = UNSIGN;
+					 inst_vld = 1'b1;
+				end
+				`LUI: begin
+				    imm_sel = SE20_UI;
+					 a_sel = REG;
+					 b_sel = OTHER_OPERAND;
+					 alu_sel = LUI;
+					 mem_rw = READ;
+					 reg_wen = ENABLE;
+					 wb_sel = ALU;
+					 pc_sel = PC_FOUR;
+					 br_un = UNSIGN;
+					 inst_vld = 1'b1;
+				end
+				`AUIPC: begin
+				    imm_sel = SE20_UI;
+					 a_sel = OTHER_OPERAND;
+					 b_sel = OTHER_OPERAND;
+					 alu_sel = ADD;
+					 mem_rw = READ;
+					 reg_wen = ENABLE;
+					 wb_sel = ALU;
+					 pc_sel = PC_FOUR;
+					 br_un = UNSIGN;
+					 inst_vld = 1'b1;
+				end
+				`LOAD: begin
+				    imm_sel = REG;
+				    a_sel = REG;
+				    b_sel = OTHER_OPERAND;
+				    alu_sel = ADD;
+				    mem_rw = READ;
+				    reg_wen = ENABLE;
+				    wb_sel = LD_DATA;
+				    pc_sel = PC_FOUR;
+				    br_un = UNSIGN;
+				    inst_vld = 1'b1;
 				end
 		  endcase
 	 end
